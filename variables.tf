@@ -1,0 +1,27 @@
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+}
+
+variable "location" {
+  description = "Azure region for the project"
+  type        = string
+  default     = "eastus2"
+}
+
+variable "project_name" {
+  description = "Short name used for Azure resources"
+  type        = string
+  default     = "lumen"
+}
+
+variable "environment" {
+  description = "Deployment environment"
+  type        = string
+  default     = "dev"
+}
+variable "search_location" {
+  description = "Azure region for AI Search"
+  type        = string
+  default     = "centralus"
+}
