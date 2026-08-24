@@ -1,11 +1,10 @@
 from app.main import QuestionRequest, ask, health, root
 
 
-def test_root_describes_service() -> None:
-    result = root()
+def test_root_serves_chat_interface() -> None:
+    response = root()
 
-    assert result["name"] == "Lumen Support Copilot"
-    assert result["docs"] == "/docs"
+    assert response.path == "app/static/index.html"
 
 
 def test_health_reports_configuration() -> None:

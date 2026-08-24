@@ -31,3 +31,9 @@ output "document_container_name" {
   description = "Private document container"
   value       = azurerm_storage_container.documents.name
 }
+
+
+output "application_url" {
+  description = "Public Lumen application URL"
+  value       = "https://${azurerm_container_app.web.ingress[0].fqdn}"
+}

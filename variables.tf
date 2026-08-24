@@ -25,3 +25,8 @@ variable "search_location" {
   type        = string
   default     = "centralus"
 }
+
+variable "alert_email" {
+  description = "Email address that receives Azure Monitor alerts"
+  type        = string
+}

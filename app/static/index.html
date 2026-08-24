@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lumen Support Copilot</title>
+  <style>
+    :root {
+      --background: #f4f1e8;
+      --surface: #fffdf7;
+      --text: #17231c;
+      --muted: #667069;
+      --green: #18583d;
+      --lime: #d9f58c;
+      --border: #d5d7ce;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--background);
+      font-family: Inter, Arial, sans-serif;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 6vw;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      color: var(--lime);
+      background: var(--green);
+      font-family: Georgia, serif;
+      font-style: italic;
+    }
+
+    .status {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    main {
+      width: min(1000px, 92vw);
+      margin: 60px auto;
+    }
+
+    .intro {
+      max-width: 760px;
+      margin-bottom: 36px;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+    }
+
+    h1 {
+      margin: 14px 0;
+      font: 500 clamp(42px, 7vw, 76px)/1 Georgia, serif;
+      letter-spacing: -0.04em;
+    }
+
+    .intro p {
+      color: var(--muted);
+      font: 18px/1.6 Georgia, serif;
+    }
+
+    .chat {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: 0 24px 70px rgb(20 40 28 / 12%);
+    }
+
+    #messages {
+      min-height: 330px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    .message {
+      margin-bottom: 22px;
+      padding: 18px;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+
+    .user {
+      margin-left: 15%;
+      background: #e9e9e1;
+    }
+
+    .assistant {
+      margin-right: 8%;
+      border-left: 4px solid var(--green);
+      background: #eef3e8;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .citations {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    textarea {
+      min-height: 64px;
+      padding: 14px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: white;
+      font: 15px/1.4 inherit;
+    }
+
+    button {
+      min-width: 110px;
+      border: 0;
+      border-radius: 6px;
+      color: white;
+      background: var(--green);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover { background: #0e422c; }
+    button:disabled { cursor: wait; opacity: 0.6; }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .example {
+      min-width: auto;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      color: var(--green);
+      background: transparent;
+      font-size: 12px;
+    }
+
+    @media (max-width: 650px) {
+      main { margin-top: 36px; }
+      form { grid-template-columns: 1fr; }
+      button { min-height: 48px; }
+      .user, .assistant { margin-inline: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">L</span>
+      <span>Lumen</span>
+    </div>
+    <div class="status">● AZURE CONNECTED</div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow">AI DAY & KNOWLEDGE COPILOT</div>
+      <h1>Plan your day. Ask anything.</h1>
+      <p>
+        Ask a support-policy question. Lumen searches the knowledge
+        base and returns a grounded answer with citations.
+      </p>
+    </section>
+
+    <div class="safety-notice">
+      <strong>Safety &amp; information notice:</strong>
+      Lumen refuses requests involving weapons, explosives, violence,
+      illegal activity, or self-harm. Lumen is not currently connected
+      to live news, so news answers may be outdated. Verify current
+      events with reputable sources.
+    </div>
+
+    <div class="examples">
+      <button class="example">Plan my day from 9 AM to 6 PM</button>
+      <button class="example">Explain cloud computing simply</button>
+      <button class="example">Can damaged orders be refunded?</button>
+    </div>
+
+    <section class="chat">
+      <div id="messages">
+        <div class="message assistant">
+          <span class="label">LUMEN</span>
+          Hello! Ask me about returns, damaged orders, delivery
+          delays, or account security.
+        </div>
+      </div>
+
+      <form id="chat-form">
+        <textarea
+          id="question"
+          placeholder="Type a message..."
+          required
+          minlength="1"
+        ></textarea>
+        <button id="send" type="submit">Ask Lumen</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector("#chat-form");
+    const question = document.querySelector("#question");
+    const messages = document.querySelector("#messages");
+    const send = document.querySelector("#send");
+
+    function addMessage(type, text, citations = []) {
+      const element = document.createElement("div");
+      element.className = `message ${type}`;
+
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = type === "user" ? "YOU" : "LUMEN";
+      element.appendChild(label);
+
+      const content = document.createElement("div");
+      content.textContent = text;
+      element.appendChild(content);
+
+      if (citations.length) {
+        const sourceList = document.createElement("div");
+        sourceList.className = "citations";
+        sourceList.textContent = "Sources: " + citations
+          .map(item => `[${item.number}] ${item.title}`)
+          .join(" · ");
+        element.appendChild(sourceList);
+      }
+
+      messages.appendChild(element);
+      messages.scrollTop = messages.scrollHeight;
+      return element;
+    }
+
+    async function askLumen(text) {
+      addMessage("user", text);
+      const loading = addMessage("assistant", "Searching the knowledge base...");
+      send.disabled = true;
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ question: text })
+        });
+
+        if (!response.ok) {
+          const failure = await response.json().catch(() => ({}));
+          throw new Error(failure.detail || `Request failed (${response.status})`);
+        }
+
+        const data = await response.json();
+        loading.remove();
+        addMessage("assistant", data.answer, data.citations);
+      } catch (error) {
+        loading.remove();
+        addMessage("assistant", error.message || "The request failed.");
+      } finally {
+        send.disabled = false;
+        question.focus();
+      }
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const text = question.value.trim();
+      if (!text) return;
+      question.value = "";
+      askLumen(text);
+    });
+
+    document.querySelectorAll(".example").forEach(button => {
+      button.addEventListener("click", () => {
+        question.value = button.textContent;
+        question.focus();
+      });
+    });
+  </script>
+</body>
+</html>

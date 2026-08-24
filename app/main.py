@@ -1,63 +1,19 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
-from app.ai import answer_question
-from app.config import settings
-
-app = FastAPI(
-    title="Lumen Support Copilot",
-    description="Terraform-managed RAG assistant running on Azure AI",
-    version="1.0.0",
-)
-
-
-class QuestionRequest(BaseModel):
-    question: str = Field(min_length=3, max_length=2000)
-
-
-class AnswerResponse(BaseModel):
-    answer: str
-    model: str
-
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {
-        "status": "healthy",
-        "model": settings.chat_deployment,
-        "search_index": settings.search_index,
-    }
-
-
-@app.post("/ask", response_model=AnswerResponse)
-def ask(request: QuestionRequest) -> AnswerResponse:
-    try:
-        answer = answer_question(request.question)
-        return AnswerResponse(
-            answer=answer,
-            model=settings.chat_deployment,
-        )
-    except Exception as exc:
-        raise HTTPException(
-            status_code=502,
-            detail="Azure AI request failed",
-        ) from exc
-
-from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from app.config import settings
 from app.rag import answer_with_sources
 
 app = FastAPI(
-    title="Lumen Support Copilot",
-    description="Terraform-managed RAG assistant running on Azure AI",
+    title="Lumen Day & Knowledge Copilot",
+    description="Terraform-managed AI assistant running on Azure",
     version="1.0.0",
 )
 
 
 class QuestionRequest(BaseModel):
-    question: str = Field(min_length=3, max_length=2000)
+    question: str = Field(min_length=1, max_length=2000)
 
 
 class Citation(BaseModel):
@@ -73,12 +29,9 @@ class AnswerResponse(BaseModel):
     citations: list[Citation]
 
 
-@app.get("/")
-def root() -> dict[str, str]:
-    return {
-        "name": "Lumen Support Copilot",
-        "docs": "/docs",
-    }
+@app.get("/", response_class=FileResponse)
+def root() -> FileResponse:
+    return FileResponse("app/static/index.html")
 
 
 @app.get("/health")
