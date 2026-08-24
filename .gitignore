@@ -3,3 +3,7 @@
 *.tfstate.*
 terraform.tfvars
 crash.log
+.venv/
+__pycache__/
+*.pyc
+.env

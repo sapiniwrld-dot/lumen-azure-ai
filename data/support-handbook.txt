@@ -1,0 +1,13 @@
+Lumen Support Handbook
+
+Damaged Orders
+If an order arrives damaged, the customer is eligible for a full refund. The refund includes the original shipping fee and any express shipping upgrade. Support agents should request a photo or customer statement, refund the original payment method, and select DAMAGED_IN_TRANSIT as the resolution reason.
+
+Returns
+Customers may return unused products within 30 days of delivery. Products must include their original packaging. Final-sale products cannot be returned unless they arrived damaged or defective.
+
+Delayed Deliveries
+If standard shipping is delayed by more than seven business days, support agents may refund the shipping fee. If the package has not moved for ten business days, agents may offer either a replacement or a full refund.
+
+Account Security
+Support agents must never request a customer's password or full payment-card number. Identity verification should use the approved email verification workflow.
