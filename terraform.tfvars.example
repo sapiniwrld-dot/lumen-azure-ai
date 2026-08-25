@@ -1,0 +1,7 @@
+subscription_id       = "00000000-0000-0000-0000-000000000000"
+location              = "eastus2"
+search_location       = "centralus"
+project_name          = "lumen"
+environment           = "dev"
+alert_email           = "you@example.com"
+monthly_budget_amount = 25

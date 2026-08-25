@@ -30,3 +30,9 @@ variable "alert_email" {
   description = "Email address that receives Azure Monitor alerts"
   type        = string
 }
+
+variable "monthly_budget_amount" {
+  description = "Monthly Azure budget for the Lumen resource group"
+  type        = number
+  default     = 25
+}

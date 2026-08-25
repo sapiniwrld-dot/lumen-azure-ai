@@ -1,28 +1,102 @@
-# Lumen — Azure AI Support Copilot
+# Lumen — Azure AI Day & Knowledge Copilot
 
-Lumen is a retrieval-augmented generation (RAG) assistant for customer-support teams. It retrieves relevant policy passages from Azure AI Search, generates grounded answers with Azure OpenAI, and returns citations for verification.
+[![CI](https://github.com/sapiniwrld-dot/lumen-azure-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/sapiniwrld-dot/lumen-azure-ai/actions/workflows/ci.yml)
 
-## Highlights
+Lumen is a production-style retrieval-augmented generation assistant built on Azure. It answers general questions, helps users plan their day, and grounds support-policy answers in indexed documents with citations.
 
-- Infrastructure defined entirely with Terraform
-- GPT-5 Mini and text-embedding-3-small on Azure OpenAI
-- Hybrid keyword and vector retrieval with Azure AI Search
-- Private source-document storage in Azure Blob Storage
-- Keyless authentication through Microsoft Entra ID and Azure RBAC
-- FastAPI service with generated OpenAPI documentation
-- Grounded answers with source citations
-- Automated tests that avoid paid cloud calls
+**[Try the live application](https://ca-lumen-dev-web.thankfulsea-81ba702c.eastus2.azurecontainerapps.io)**
+
+## What this project demonstrates
+
+- Terraform infrastructure as code
+- Azure OpenAI and Azure AI Search
+- Private documents in Azure Blob Storage
+- Managed Identity and Azure RBAC
+- FastAPI and Azure Container Apps
+- Per-IP prompt rate limiting
+- Five-region availability testing
+- Azure Monitor alerts and a $25 budget
+- GitHub Actions tests and container builds
 
 ## Architecture
 
-```text
-Client
-  |
-  v
-FastAPI
-  |
-  +--> Azure AI Search ----> relevant document passages
-  |
-  +--> Azure OpenAI -------> grounded answer with citations
-  |
-  +--> Blob Storage -------> private source documents
+    User
+      |
+      v
+    Azure Container Apps -> FastAPI
+      |                    |
+      |                    +-> Azure OpenAI
+      |                    +-> Azure AI Search -> Blob Storage
+      |
+      +-> Azure Monitor -> Email alerts
+      ^
+      |
+    Five-region health test
+
+    Terraform provisions the Azure resources.
+    Managed Identity and RBAC secure service-to-service access.
+
+## Reliability and cost controls
+
+Lumen monitors:
+
+- HTTP 5xx server errors
+- Responses averaging more than five seconds
+- Container restarts
+- Memory usage above 85%
+- External health failures from at least three of five regions
+
+The resource group has a $25 monthly budget with alerts at 50%, 80%, and 100%, plus a forecast warning.
+
+The public `/ask` endpoint permits 10 prompts per IP address per minute and returns HTTP 429 when the limit is exceeded.
+
+## Run locally
+
+Prerequisites: Python 3.14, Azure CLI, Terraform, and an authenticated Azure account.
+
+1. Clone the repository.
+2. Create and activate `.venv`.
+3. Install `requirements.txt`.
+4. Copy `.env.example` to `.env`.
+5. Run `uvicorn app.main:app --reload`.
+6. Open `http://127.0.0.1:8000`.
+
+## Provision Azure infrastructure
+
+1. Run `az login`.
+2. Copy `terraform.tfvars.example` to `terraform.tfvars`.
+3. Add your subscription ID and alert email.
+4. Run `terraform init`.
+5. Run `terraform fmt -check` and `terraform validate`.
+6. Review `terraform plan`.
+7. Run `terraform apply`.
+
+Never commit `.env`, `terraform.tfvars`, Terraform state, or saved plan files.
+
+## Test and ingest
+
+Run tests with `pytest -q`.
+
+Load the sample support handbook into Azure AI Search with `python -m scripts.ingest`.
+
+Tests mock paid AI calls and verify the API, health response, grounded answers, and rate limiting.
+
+## Public API
+
+Health endpoint:
+
+    GET /health
+
+Prompt endpoint:
+
+    POST /ask
+    Content-Type: application/json
+    {"question":"Help me plan a productive afternoon."}
+
+## Clean up
+
+To avoid ongoing Azure charges, first review `terraform plan -destroy`, then run `terraform destroy` only when you intend to remove the project.
+
+## Résumé description
+
+Built and deployed a Terraform-managed RAG assistant on Azure using Azure OpenAI, AI Search, Blob Storage, Managed Identity, FastAPI, Docker, and Container Apps. Added multi-region availability monitoring, performance alerts, cost budgets, rate limiting, automated tests, and GitHub Actions CI.

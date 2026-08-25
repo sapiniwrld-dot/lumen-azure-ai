@@ -351,3 +351,129 @@ resource "azurerm_monitor_metric_alert" "high_memory" {
     action_group_id = azurerm_monitor_action_group.lumen_alerts.id
   }
 }
+
+resource "azurerm_consumption_budget_resource_group" "lumen" {
+  name              = "budget-${local.prefix}"
+  resource_group_id = azurerm_resource_group.main.id
+  amount            = var.monthly_budget_amount
+  time_grain        = "Monthly"
+
+  time_period {
+    start_date = "2026-08-01T00:00:00Z"
+    end_date   = "2036-08-01T00:00:00Z"
+  }
+
+  notification {
+    enabled        = true
+    threshold      = 50
+    operator       = "GreaterThanOrEqualTo"
+    threshold_type = "Actual"
+    contact_emails = [var.alert_email]
+  }
+
+  notification {
+    enabled        = true
+    threshold      = 80
+    operator       = "GreaterThanOrEqualTo"
+    threshold_type = "Actual"
+    contact_emails = [var.alert_email]
+  }
+
+  notification {
+    enabled        = true
+    threshold      = 100
+    operator       = "GreaterThanOrEqualTo"
+    threshold_type = "Actual"
+    contact_emails = [var.alert_email]
+  }
+
+  notification {
+    enabled        = true
+    threshold      = 100
+    operator       = "GreaterThanOrEqualTo"
+    threshold_type = "Forecasted"
+    contact_emails = [var.alert_email]
+  }
+}
+
+resource "azurerm_application_insights" "monitoring" {
+  name                = "appi-${local.prefix}"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  workspace_id        = azurerm_log_analytics_workspace.main.id
+  application_type    = "web"
+  tags                = local.tags
+}
+
+resource "azurerm_application_insights_standard_web_test" "health" {
+  name                    = "webtest-${local.prefix}-health"
+  resource_group_name     = azurerm_resource_group.main.name
+  location                = azurerm_resource_group.main.location
+  application_insights_id = azurerm_application_insights.monitoring.id
+  description             = "Checks the public Lumen health endpoint."
+  enabled                 = true
+  frequency               = 300
+  timeout                 = 30
+  retry_enabled           = true
+
+  geo_locations = [
+    "us-va-ash-azr",
+    "us-il-ch1-azr",
+    "us-ca-sjc-azr",
+    "emea-nl-ams-azr",
+    "apac-sg-sin-azr",
+  ]
+
+  request {
+    url                              = "https://${azurerm_container_app.web.ingress[0].fqdn}/health"
+    http_verb                        = "GET"
+    follow_redirects_enabled         = true
+    parse_dependent_requests_enabled = false
+  }
+
+  validation_rules {
+    expected_status_code        = 200
+    ssl_check_enabled           = true
+    ssl_cert_remaining_lifetime = 7
+
+    content {
+      content_match      = "\"status\":\"healthy\""
+      ignore_case        = false
+      pass_if_text_found = true
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      "hidden-link:${azurerm_application_insights.monitoring.id}" = "Resource"
+    }
+  )
+}
+
+resource "azurerm_monitor_metric_alert" "external_availability" {
+  name                = "alert-${local.prefix}-external-availability"
+  resource_group_name = azurerm_resource_group.main.name
+  scopes = [
+    azurerm_application_insights_standard_web_test.health.id,
+    azurerm_application_insights.monitoring.id,
+  ]
+  description              = "Lumen failed external health checks from at least three regions."
+  severity                 = 0
+  frequency                = "PT1M"
+  window_size              = "PT5M"
+  auto_mitigate            = true
+  target_resource_type     = "Microsoft.Insights/webtests"
+  target_resource_location = azurerm_resource_group.main.location
+  tags                     = local.tags
+
+  application_insights_web_test_location_availability_criteria {
+    web_test_id           = azurerm_application_insights_standard_web_test.health.id
+    component_id          = azurerm_application_insights.monitoring.id
+    failed_location_count = 3
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.lumen_alerts.id
+  }
+}
