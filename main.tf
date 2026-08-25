@@ -183,7 +183,7 @@ resource "azurerm_container_app" "web" {
 
     container {
       name   = "lumen"
-      image  = "ghcr.io/sapiniwrld-dot/lumen-azure-ai@sha256:b6d6a5edfc479980176344e193ca31ba0f4ae89881e63b144db92462fa5b9644"
+      image  = "ghcr.io/sapiniwrld-dot/lumen-azure-ai@sha256:cfcdc39b19d8946de353396f1aec7a6e0dfb52647a73301991794a49bf597096"
       cpu    = 0.5
       memory = "1Gi"
 
@@ -443,12 +443,7 @@ resource "azurerm_application_insights_standard_web_test" "health" {
     }
   }
 
-  tags = merge(
-    local.tags,
-    {
-      "hidden-link:${azurerm_application_insights.monitoring.id}" = "Resource"
-    }
-  )
+  tags = local.tags
 }
 
 resource "azurerm_monitor_metric_alert" "external_availability" {
