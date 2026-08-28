@@ -61,6 +61,19 @@ Prerequisites: Python 3.14, Azure CLI, Terraform, and an authenticated Azure acc
 5. Run `uvicorn app.main:app --reload`.
 6. Open `http://127.0.0.1:8000`.
 
+## Container security
+
+The production image installs current Debian security updates during the build, runs as an unprivileged `lumen` user, and includes a Docker health check for `/health`. Azure Container Apps deploys an immutable GHCR digest recorded in Terraform rather than a mutable tag.
+
+Build, verify, and scan the image locally:
+
+    docker build --pull --no-cache --tag lumen-azure-ai:local .
+    docker run --detach --name lumen-local --env-file .env --publish 8000:8000 lumen-azure-ai:local
+    docker inspect --format "{{.State.Health.Status}} {{.Config.User}}" lumen-local
+    docker scout cves local://lumen-azure-ai:local
+
+Review scanner findings against the installed runtime packages and upstream Debian security tracker before deployment. Do not suppress findings solely to make a scan pass.
+
 ## Provision Azure infrastructure
 
 1. Run `az login`.
