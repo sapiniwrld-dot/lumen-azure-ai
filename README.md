@@ -10,6 +10,7 @@ Lumen is a production-style retrieval-augmented generation assistant built on Az
 
 - Terraform infrastructure as code
 - Azure OpenAI and Azure AI Search
+- Pluggable vector retrieval with PostgreSQL and pgvector
 - Private documents in Azure Blob Storage
 - Managed Identity and Azure RBAC
 - FastAPI and Azure Container Apps
@@ -27,6 +28,7 @@ Lumen is a production-style retrieval-augmented generation assistant built on Az
       |                    |
       |                    +-> Azure OpenAI
       |                    +-> Azure AI Search -> Blob Storage
+      |                    +-> PostgreSQL + pgvector (optional backend)
       |
       +-> Azure Monitor -> Email alerts
       ^
@@ -52,14 +54,18 @@ The public `/ask` endpoint permits 10 prompts per IP address per minute and retu
 
 ## Run locally
 
-Prerequisites: Python 3.14, Azure CLI, Terraform, and an authenticated Azure account.
+Prerequisites: Python 3.14, Azure CLI, Docker Desktop, Terraform, and an authenticated Azure account.
 
 1. Clone the repository.
 2. Create and activate `.venv`.
 3. Install `requirements.txt`.
 4. Copy `.env.example` to `.env`.
-5. Run `uvicorn app.main:app --reload`.
-6. Open `http://127.0.0.1:8000`.
+5. Add the deployed Azure OpenAI endpoint and deployment names to `.env`.
+6. Choose and prepare a retrieval backend:
+   - Azure AI Search: set `RETRIEVAL_BACKEND=azure_search`, then run `python -m scripts.ingest`.
+   - pgvector: set `RETRIEVAL_BACKEND=pgvector`, run `docker compose up -d postgres`, then run `python -m scripts.ingest_pgvector`.
+7. Run `uvicorn app.main:app --reload`.
+8. Open `http://127.0.0.1:8000`.
 
 ## Container security
 
@@ -88,11 +94,20 @@ Never commit `.env`, `terraform.tfvars`, Terraform state, or saved plan files.
 
 ## Test and ingest
 
-Run tests with `pytest -q`.
+Run the test suite:
 
-Load the sample support handbook into Azure AI Search with `python -m scripts.ingest`.
+    pytest -q
 
-Tests mock paid AI calls and verify the API, health response, grounded answers, and rate limiting.
+Load the sample support handbook into Azure AI Search:
+
+    python -m scripts.ingest
+
+Or load it into PostgreSQL with pgvector:
+
+    docker compose up -d postgres
+    python -m scripts.ingest_pgvector
+
+Tests mock paid AI calls and verify the API, health response, grounded answers, rate limiting, retrieval backend routing, and pgvector ingestion.
 
 ## Public API
 
@@ -112,4 +127,4 @@ To avoid ongoing Azure charges, first review `terraform plan -destroy`, then run
 
 ## Résumé description
 
-Built and deployed a Terraform-managed RAG assistant on Azure using Azure OpenAI, AI Search, Blob Storage, Managed Identity, FastAPI, Docker, and Container Apps. Added multi-region availability monitoring, performance alerts, cost budgets, rate limiting, automated tests, and GitHub Actions CI.
+Built and deployed a Terraform-managed RAG assistant on Azure using Azure OpenAI, AI Search, Blob Storage, Managed Identity, FastAPI, Docker, and Container Apps. Added a pluggable PostgreSQL and pgvector retrieval backend with document ingestion, semantic search, grounded answers, and source citations, plus multi-region monitoring, rate limiting, automated tests, and GitHub Actions CI.
