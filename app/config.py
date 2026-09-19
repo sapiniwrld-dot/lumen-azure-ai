@@ -15,11 +15,11 @@ def required(name: str) -> str:
 
 @dataclass(frozen=True)
 class Settings:
+    retrieval_backend: str = os.getenv("RETRIEVAL_BACKEND", "azure_search")
+    pgvector_dsn: str | None = os.getenv("PGVECTOR_DSN")
     openai_endpoint: str = required("AZURE_OPENAI_ENDPOINT")
     chat_deployment: str = required("AZURE_OPENAI_CHAT_DEPLOYMENT")
-    embedding_deployment: str = required(
-        "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
-    )
+    embedding_deployment: str = required("AZURE_OPENAI_EMBEDDING_DEPLOYMENT")
     search_endpoint: str = required("AZURE_SEARCH_ENDPOINT")
     search_index: str = required("AZURE_SEARCH_INDEX")
     storage_account: str = required("AZURE_STORAGE_ACCOUNT")
