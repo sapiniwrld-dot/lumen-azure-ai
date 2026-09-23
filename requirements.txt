@@ -10,6 +10,7 @@ charset-normalizer==3.5.1
 click==8.4.2
 cryptography==50.0.0
 fastapi==0.141.1
+google-genai==2.24.0
 h11==0.16.0
 httpcore2==2.12.0
 httptools==0.8.0
@@ -43,4 +44,4 @@ urllib3==2.7.0
 uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
-websockets==17.0.1
+websockets==16.1.1

@@ -1,5 +1,5 @@
-from app.ai import client
-from app.config import settings
+from app.chat import generate_text
+
 from app.retrieval import retrieve
 
 DANGEROUS_TERMS = {
@@ -48,15 +48,10 @@ User request:
 {question}
 """
 
-    response = client.responses.create(
-        model=settings.chat_deployment,
-        input=prompt,
-        reasoning={"effort": "low"},
-        max_output_tokens=700,
-    )
+    answer = generate_text(prompt, max_output_tokens=700)
 
     return {
-        "answer": response.output_text,
+        "answer": answer,
         "citations": [],
     }
 
@@ -88,12 +83,7 @@ Question:
 {question}
 """
 
-    response = client.responses.create(
-        model=settings.chat_deployment,
-        input=prompt,
-        reasoning={"effort": "low"},
-        max_output_tokens=500,
-    )
+    answer = generate_text(prompt, max_output_tokens=500)
 
     citations = [
         {
@@ -106,7 +96,7 @@ Question:
     ]
 
     return {
-        "answer": response.output_text,
+        "answer": answer,
         "citations": citations,
     }
 

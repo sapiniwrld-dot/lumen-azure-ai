@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
+from app.chat import active_chat_model
 from app.config import settings
-
 from app.main import (
     QuestionRequest,
     _request_history,
@@ -22,7 +22,8 @@ def test_health_reports_configuration() -> None:
     result = health()
 
     assert result["status"] == "healthy"
-    assert result["model"] == settings.chat_deployment
+    assert result["provider"] == settings.chat_provider
+    assert result["model"] == active_chat_model()
     assert result["search_index"] == settings.search_index
 
 
@@ -51,7 +52,8 @@ def test_ask_returns_grounded_response(monkeypatch) -> None:
     )
 
     assert response.answer == "Shipping is refundable [1]."
-    assert response.model == settings.chat_deployment
+    assert response.provider == settings.chat_provider
+    assert response.model == active_chat_model()
     assert response.citations[0].title == "Damaged Orders"
 
 

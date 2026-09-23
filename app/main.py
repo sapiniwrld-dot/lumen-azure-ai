@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
+from app.chat import active_chat_model
 from app.config import settings
 from app.rag import answer_with_sources
 
@@ -29,6 +30,7 @@ class Citation(BaseModel):
 
 class AnswerResponse(BaseModel):
     answer: str
+    provider: str
     model: str
     citations: list[Citation]
 
@@ -88,7 +90,8 @@ def root() -> FileResponse:
 def health() -> dict[str, str]:
     return {
         "status": "healthy",
-        "model": settings.chat_deployment,
+        "provider": settings.chat_provider,
+        "model": active_chat_model(),
         "search_index": settings.search_index,
     }
 
@@ -100,11 +103,12 @@ def ask(request: QuestionRequest) -> AnswerResponse:
 
         return AnswerResponse(
             answer=result["answer"],
-            model=settings.chat_deployment,
+            provider=settings.chat_provider,
+            model=active_chat_model(),
             citations=result["citations"],
         )
     except Exception as exc:
         raise HTTPException(
             status_code=502,
-            detail="Azure AI request failed",
+            detail="AI provider request failed",
         ) from exc
