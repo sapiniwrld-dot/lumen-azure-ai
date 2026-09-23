@@ -16,7 +16,10 @@ def required(name: str) -> str:
 @dataclass(frozen=True)
 class Settings:
     chat_provider: str = os.getenv("CHAT_PROVIDER", "azure_openai")
-    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    gemini_model: str = os.getenv(
+        "GEMINI_MODEL",
+        "gemini-3.5-flash-lite",
+    )
     gemini_api_key: str | None = (
         os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     )

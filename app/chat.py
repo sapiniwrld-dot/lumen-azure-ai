@@ -87,6 +87,11 @@ def generate_text(prompt: str, *, max_output_tokens: int) -> str:
             contents=prompt,
             config=types.GenerateContentConfig(
                 max_output_tokens=max_output_tokens,
+                automatic_function_calling=(
+                    types.AutomaticFunctionCallingConfig(
+                        disable=True,
+                    )
+                ),
             ),
         )
         text = response.text
