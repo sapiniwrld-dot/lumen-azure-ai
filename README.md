@@ -10,6 +10,7 @@ Lumen is a production-style retrieval-augmented generation assistant built on Az
 
 - Terraform infrastructure as code
 - Multi-provider generation with Azure OpenAI, Gemini API, and Vertex AI
+- LangGraph two-agent orchestration for retrieval and grounded responses
 - Pluggable retrieval with Azure AI Search or PostgreSQL and pgvector
 - Private documents in Azure Blob Storage
 - Managed Identity and Azure RBAC
@@ -37,6 +38,13 @@ Lumen is a production-style retrieval-augmented generation assistant built on Az
 
     Terraform provisions the Azure resources.
     Managed Identity and RBAC secure service-to-service access.
+    ### LangGraph support workflow
+
+    START -> retrieval_agent -> response_agent -> END
+
+The retrieval agent performs semantic search through the configured Azure AI Search or pgvector backend and prepares numbered evidence. The response agent sends that grounded context through the configured Azure OpenAI, Gemini API, or Vertex AI provider and returns an answer with citations.
+
+The graph is compiled once and reused for stateless requests. It preserves the existing safety routing and uses one generation call per support question.
 
 ## Reliability and cost controls
 
@@ -111,7 +119,7 @@ Or load it into PostgreSQL with pgvector:
     docker compose up -d postgres
     python -m scripts.ingest_pgvector
 
-Tests mock paid AI calls and verify the API, health response, grounded answers, rate limiting, chat provider routing, retrieval backend routing, and pgvector ingestion.
+Tests mock paid AI calls and verify the API, health response, LangGraph agent execution, safety and question routing, grounded answers, rate limiting, chat provider routing, retrieval backend routing, and pgvector ingestion.
 
 ## Public API
 
@@ -131,4 +139,4 @@ To avoid ongoing Azure charges, first review `terraform plan -destroy`, then run
 
 ## Résumé description
 
-Built and deployed a Terraform-managed RAG assistant on Azure using FastAPI, Docker, Container Apps, Managed Identity, Azure AI Search, and Blob Storage. Added pluggable answer generation across Azure OpenAI, Gemini API, and Vertex AI, plus interchangeable Azure AI Search and PostgreSQL/pgvector retrieval with document ingestion, semantic search, grounded answers, and source citations. Added multi-region monitoring, rate limiting, automated tests, and GitHub Actions CI.
+Built and deployed a Terraform-managed RAG assistant on Azure using FastAPI, Docker, Container Apps, Managed Identity, Azure AI Search, and Blob Storage. Orchestrated support queries with a LangGraph two-agent workflow for semantic retrieval and cited response generation. Added pluggable generation across Azure OpenAI, Gemini API, and Vertex AI, plus interchangeable Azure AI Search and PostgreSQL/pgvector retrieval. Added multi-region monitoring, rate limiting, automated tests, and GitHub Actions CI.

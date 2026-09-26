@@ -1,15 +1,28 @@
 from app.chat import generate_text
+from app.workflow import run_support_workflow
 
-from app.retrieval import retrieve
 
 DANGEROUS_TERMS = {
-    "bomb", "explosive", "weapon", "poison",
-    "kill", "murder", "terrorist",
+    "bomb",
+    "explosive",
+    "weapon",
+    "poison",
+    "kill",
+    "murder",
+    "terrorist",
 }
 
 SUPPORT_TERMS = {
-    "order", "refund", "return", "delivery", "shipping",
-    "damaged", "product", "account", "password", "payment",
+    "order",
+    "refund",
+    "return",
+    "delivery",
+    "shipping",
+    "damaged",
+    "product",
+    "account",
+    "password",
+    "payment",
 }
 
 
@@ -57,48 +70,7 @@ User request:
 
 
 def answer_support_question(question: str) -> dict:
-    sources = retrieve(question)
-
-    context = "\n\n".join(
-        (
-            f"[{position}] {source['title']}\n"
-            f"{source['content']}\n"
-            f"Source: {source['source']}"
-        )
-        for position, source in enumerate(sources, start=1)
-    )
-
-    prompt = f"""
-You are Lumen, a customer-support assistant.
-
-Answer only from the supplied knowledge-base context.
-Cite supporting passages with references such as [1].
-If the context does not contain the answer, say that you do not know.
-Be concise and operationally useful.
-
-Knowledge-base context:
-{context}
-
-Question:
-{question}
-"""
-
-    answer = generate_text(prompt, max_output_tokens=500)
-
-    citations = [
-        {
-            "number": position,
-            "title": source["title"],
-            "source": source["source"],
-            "score": round(source["score"], 6),
-        }
-        for position, source in enumerate(sources, start=1)
-    ]
-
-    return {
-        "answer": answer,
-        "citations": citations,
-    }
+    return run_support_workflow(question)
 
 
 def answer_with_sources(question: str) -> dict:
