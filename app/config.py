@@ -24,6 +24,7 @@ class Settings:
     search_index: str = required("AZURE_SEARCH_INDEX")
     storage_account: str = required("AZURE_STORAGE_ACCOUNT")
     storage_container: str = required("AZURE_STORAGE_CONTAINER")
-
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    gemini_model: str = os.getenv("GEMINI_MODEL", "")
 
 settings = Settings()

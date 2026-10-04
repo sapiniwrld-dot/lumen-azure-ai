@@ -100,7 +100,7 @@ def ask(request: QuestionRequest) -> AnswerResponse:
 
         return AnswerResponse(
             answer=result["answer"],
-            model=settings.chat_deployment,
+            model=result.get("model", settings.chat_deployment),
             citations=result["citations"],
         )
     except Exception as exc:

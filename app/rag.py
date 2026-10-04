@@ -1,7 +1,7 @@
 from app.ai import client
 from app.config import settings
 from app.retrieval import retrieve
-
+from app.graph import answer_graph
 DANGEROUS_TERMS = {
     "bomb", "explosive", "weapon", "poison",
     "kill", "murder", "terrorist",
@@ -48,15 +48,13 @@ User request:
 {question}
 """
 
-    response = client.responses.create(
-        model=settings.chat_deployment,
-        input=prompt,
-        reasoning={"effort": "low"},
-        max_output_tokens=700,
-    )
+    result = answer_graph.invoke({"prompt": prompt})
+
+
 
     return {
-        "answer": response.output_text,
+        "answer": result["answer"],
+        "model": result["model"],
         "citations": [],
     }
 
@@ -88,12 +86,7 @@ Question:
 {question}
 """
 
-    response = client.responses.create(
-        model=settings.chat_deployment,
-        input=prompt,
-        reasoning={"effort": "low"},
-        max_output_tokens=500,
-    )
+    result = answer_graph.invoke({"prompt": prompt})
 
     citations = [
         {
@@ -106,10 +99,10 @@ Question:
     ]
 
     return {
-        "answer": response.output_text,
+        "answer": result["answer"],
+        "model": result["model"],
         "citations": citations,
     }
-
 
 def answer_with_sources(question: str) -> dict:
     if is_dangerous_request(question):
