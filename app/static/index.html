@@ -6,13 +6,51 @@
   <title>Lumen Support Copilot</title>
   <style>
     :root {
-      --background: #f4f1e8;
-      --surface: #fffdf7;
-      --text: #17231c;
-      --muted: #667069;
-      --green: #18583d;
-      --lime: #d9f58c;
-      --border: #d5d7ce;
+      color-scheme: dark;
+      --background: #090d14;
+      --surface: #111923;
+      --text: #edf4ff;
+      --muted: #98a8bd;
+      --green: #67e8f9;
+      --lime: #090d14;
+      --border: #263344;
+      --input: #0b121c;
+      --assistant: #17212e;
+      --user: #15303a;
+      --button-text: #071219;
+      --hover: #a5f3fc;
+    }
+
+    :root[data-theme="pearl"] {
+      color-scheme: light;
+      --background: #f5f5f7;
+      --surface: #ffffff;
+      --text: #1d1d1f;
+      --muted: #626269;
+      --green: #0066cc;
+      --lime: #ffffff;
+      --border: #d8dce3;
+      --input: #f5f5f7;
+      --assistant: #f0f2f5;
+      --user: #e5efff;
+      --button-text: #ffffff;
+      --hover: #0055ad;
+    }
+
+    :root[data-theme="ocean"] {
+      color-scheme: dark;
+      --background: #061626;
+      --surface: #0d243b;
+      --text: #edf6ff;
+      --muted: #a0b9d0;
+      --green: #80c7ff;
+      --lime: #061626;
+      --border: #29445f;
+      --input: #081c30;
+      --assistant: #15324d;
+      --user: #1b405e;
+      --button-text: #061626;
+      --hover: #b3ddff;
     }
 
     * { box-sizing: border-box; }
@@ -21,8 +59,20 @@
       margin: 0;
       min-height: 100vh;
       color: var(--text);
-      background: var(--background);
-      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(
+          ellipse at 15% 0%,
+          rgb(34 211 238 / 12%),
+          transparent 45%
+        ),
+        radial-gradient(
+          ellipse at 90% 25%,
+          rgb(99 102 241 / 10%),
+          transparent 40%
+        ),
+        var(--background);
+      font-family: -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
     }
 
     header {
@@ -65,8 +115,10 @@
     }
 
     .intro {
-      max-width: 760px;
-      margin-bottom: 36px;
+      max-width: 860px;
+      margin: 0 auto 48px;
+      padding: 32px 0 12px;
+      text-align: center;
     }
 
     .eyebrow {
@@ -76,22 +128,34 @@
       letter-spacing: 0.14em;
     }
 
-    h1 {
-      margin: 14px 0;
-      font: 500 clamp(42px, 7vw, 76px)/1 Georgia, serif;
-      letter-spacing: -0.04em;
+     h1 {
+      margin: 18px 0;
+      font-size: clamp(48px, 8vw, 88px);
+      font-weight: 600;
+      line-height: 1.02;
+      letter-spacing: -0.06em;
+      text-wrap: balance;
     }
 
     .intro p {
-      color: var(--muted);
-      font: 18px/1.6 Georgia, serif;
+      max-width: 540px;
+      margin: 22px auto 0;
+      color: #a1a1aa;
+      font-size: 20px;
+      line-height: 1.5;
+      letter-spacing: -0.025em;
     }
 
     .chat {
       overflow: hidden;
-      border: 1px solid var(--border);
+      border: 1px solid rgb(255 255 255 / 12%);
+      border-radius: 28px;
       background: var(--surface);
-      box-shadow: 0 24px 70px rgb(20 40 28 / 12%);
+      backdrop-filter: blur(24px) saturate(140%);
+      -webkit-backdrop-filter: blur(24px) saturate(140%);
+      box-shadow:
+        0 24px 64px rgb(0 0 0 / 24%),
+        inset 0 1px 0 rgb(255 255 255 / 6%);
     }
 
     #messages {
@@ -110,13 +174,14 @@
 
     .user {
       margin-left: 15%;
-      background: #e9e9e1;
+      border: 1px solid rgb(103 232 249 / 18%);
+      background: rgb(103 232 249 / 8%);
     }
 
     .assistant {
       margin-right: 8%;
-      border-left: 4px solid var(--green);
-      background: #eef3e8;
+      border-left: 3px solid var(--green);
+      background: var(--assistant);
     }
 
     .label {
@@ -142,27 +207,47 @@
     }
 
     textarea {
+      width: 100%;
       min-height: 64px;
-      padding: 14px;
+      padding: 16px;
       resize: vertical;
       border: 1px solid var(--border);
-      border-radius: 6px;
-      background: white;
-      font: 15px/1.4 inherit;
+      border-radius: 14px;
+      color: var(--text);
+      background: var(--input);
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.5;
+      transition: border-color 160ms, box-shadow 160ms;
     }
 
-    button {
+   button {
       min-width: 110px;
+      padding: 14px 20px;
       border: 0;
-      border-radius: 6px;
-      color: white;
+      border-radius: 14px;
+      color: #071219;
       background: var(--green);
-      font-weight: 800;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
       cursor: pointer;
+      transition: background 160ms, box-shadow 160ms;
     }
 
-    button:hover { background: #0e422c; }
-    button:disabled { cursor: wait; opacity: 0.6; }
+    button:hover {
+      background: #a5f3fc;
+      box-shadow: 0 4px 20px rgb(103 232 249 / 15%);
+    }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 4px;
+    }
 
     .examples {
       display: flex;
@@ -194,7 +279,14 @@
       <span class="logo">L</span>
       <span>Lumen</span>
     </div>
-    <div class="status">● AZURE CONNECTED</div>
+    <div class="header-controls">
+  <label for="theme-select">Appearance</label>
+  <select id="theme-select">
+    <option value="midnight">Midnight</option>
+    <option value="pearl">Pearl</option>
+    <option value="ocean">Ocean</option>
+  </select>
+</div>
   </header>
 
   <main>
@@ -248,7 +340,7 @@
     const messages = document.querySelector("#messages");
     const send = document.querySelector("#send");
 
-    function addMessage(type, text, citations = []) {
+      function addMessage(type, text, citations = [], model = "") {
       const element = document.createElement("div");
       element.className = `message ${type}`;
 
@@ -260,6 +352,12 @@
       const content = document.createElement("div");
       content.textContent = text;
       element.appendChild(content);
+            if (type === "assistant" && model) {
+        const modelLabel = document.createElement("div");
+        modelLabel.className = "citations";
+        modelLabel.textContent = `Answered by: ${model}`;
+        element.appendChild(modelLabel);
+      }
 
       if (citations.length) {
         const sourceList = document.createElement("div");
@@ -296,7 +394,7 @@
 
         const data = await response.json();
         loading.remove();
-        addMessage("assistant", data.answer, data.citations);
+        addMessage("assistant", data.answer, data.citations, data.model);
       } catch (error) {
         loading.remove();
         addMessage("assistant", error.message || "The request failed.");
@@ -320,6 +418,36 @@
         question.focus();
       });
     });
-  </script>
+     const themeSelect = document.querySelector("#theme-select");
+    const allowedThemes = ["midnight", "pearl", "ocean"];
+
+    function applyTheme(theme) {
+      const selected = allowedThemes.includes(theme)
+        ? theme
+        : "midnight";
+
+      document.documentElement.dataset.theme = selected;
+      themeSelect.value = selected;
+    }
+
+    let savedTheme = "midnight";
+
+    try {
+      savedTheme = localStorage.getItem("lumen-theme") || "midnight";
+    } catch {
+      // Use the default when browser storage is unavailable.
+    }
+
+    applyTheme(savedTheme);
+
+    themeSelect.addEventListener("change", () => {
+      applyTheme(themeSelect.value);
+
+      try {
+        localStorage.setItem("lumen-theme", themeSelect.value);
+      } catch {
+        // Theme switching still works without browser storage.
+      }
+    });</script>
 </body>
 </html>

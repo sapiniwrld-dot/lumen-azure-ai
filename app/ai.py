@@ -16,6 +16,8 @@ token_provider = get_bearer_token_provider(
 client = OpenAI(
     base_url=f"{settings.openai_endpoint.rstrip('/')}/openai/v1/",
     api_key=token_provider,
+    timeout=10.0,
+    max_retries=0,
 )
 
 
