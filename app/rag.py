@@ -1,15 +1,28 @@
-from app.ai import client
-from app.config import settings
-from app.retrieval import retrieve
-from app.graph import answer_graph
+from app.chat import generate_text
+from app.workflow import run_support_workflow
+
+
 DANGEROUS_TERMS = {
-    "bomb", "explosive", "weapon", "poison",
-    "kill", "murder", "terrorist",
+    "bomb",
+    "explosive",
+    "weapon",
+    "poison",
+    "kill",
+    "murder",
+    "terrorist",
 }
 
 SUPPORT_TERMS = {
-    "order", "refund", "return", "delivery", "shipping",
-    "damaged", "product", "account", "password", "payment",
+    "order",
+    "refund",
+    "return",
+    "delivery",
+    "shipping",
+    "damaged",
+    "product",
+    "account",
+    "password",
+    "payment",
 }
 
 
@@ -48,61 +61,17 @@ User request:
 {question}
 """
 
-    result = answer_graph.invoke({"prompt": prompt})
-
-
+    answer = generate_text(prompt, max_output_tokens=700)
 
     return {
-        "answer": result["answer"],
-        "model": result["model"],
+        "answer": answer,
         "citations": [],
     }
 
 
 def answer_support_question(question: str) -> dict:
-    sources = retrieve(question)
+    return run_support_workflow(question)
 
-    context = "\n\n".join(
-        (
-            f"[{position}] {source['title']}\n"
-            f"{source['content']}\n"
-            f"Source: {source['source']}"
-        )
-        for position, source in enumerate(sources, start=1)
-    )
-
-    prompt = f"""
-You are Lumen, a customer-support assistant.
-
-Answer only from the supplied knowledge-base context.
-Cite supporting passages with references such as [1].
-If the context does not contain the answer, say that you do not know.
-Be concise and operationally useful.
-
-Knowledge-base context:
-{context}
-
-Question:
-{question}
-"""
-
-    result = answer_graph.invoke({"prompt": prompt})
-
-    citations = [
-        {
-            "number": position,
-            "title": source["title"],
-            "source": source["source"],
-            "score": round(source["score"], 6),
-        }
-        for position, source in enumerate(sources, start=1)
-    ]
-
-    return {
-        "answer": result["answer"],
-        "model": result["model"],
-        "citations": citations,
-    }
 
 def answer_with_sources(question: str) -> dict:
     if is_dangerous_request(question):
