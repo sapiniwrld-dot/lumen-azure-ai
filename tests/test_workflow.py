@@ -62,12 +62,6 @@ def test_response_agent_generates_answer_and_citations(monkeypatch) -> None:
                 "source": "support-handbook.txt",
                 "score": 0.876543,
             },
-            {
-                "number": 2,
-                "title": "Returns",
-                "source": "support-handbook.txt",
-                "score": 0.654321,
-            },
         ],
     }
 
@@ -111,3 +105,42 @@ def test_retrieval_failure_stops_response_agent(monkeypatch) -> None:
         )
 
     generate_text.assert_not_called()
+
+@pytest.mark.parametrize(
+    ("answer", "expected_numbers"),
+    [
+        ("A full refund is available [1].", [1]),
+        ("Returns are available [2].", [2]),
+        ("Refunds [1] and returns [2]. See [1] again.", [1, 2]),
+        ("Returns [2]. See [2] again.", [2]),
+        ("I do not know from the supplied context.", []),
+        ("Unsupported reference [99].", []),
+        ("Returns [2], plus an invalid reference [99].", [2]),
+    ],
+)
+def test_response_citations_match_references(
+    monkeypatch, answer, expected_numbers
+) -> None:
+    generate_text = Mock(return_value=answer)
+    monkeypatch.setattr(workflow, "generate_text", generate_text)
+    sources = sample_sources()
+
+    result = workflow.response_agent(
+        {
+            "question": "What is the policy?",
+            "sources": sources,
+            "context": "[1] Damaged Orders\n[2] Returns",
+        }
+    )
+
+    assert result["answer"] == answer
+    assert result["citations"] == [
+        {
+            "number": number,
+            "title": sources[number - 1]["title"],
+            "source": sources[number - 1]["source"],
+            "score": round(sources[number - 1]["score"], 6),
+        }
+        for number in expected_numbers
+    ]
+    generate_text.assert_called_once()

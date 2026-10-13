@@ -67,3 +67,40 @@ def test_dangerous_request_stops_before_agents(monkeypatch) -> None:
     assert result["citations"] == []
     run_support_workflow.assert_not_called()
     answer_general_question.assert_not_called()
+
+def test_package_wording_routes_to_support(monkeypatch) -> None:
+    support = Mock(return_value={"answer": "Policy answer [1].", "citations": []})
+    general = Mock()
+    monkeypatch.setattr(rag, "run_support_workflow", support)
+    monkeypatch.setattr(rag, "answer_general_question", general)
+
+    questions = [
+        "My package has not moved for ten business days. What are my options?",
+        "Where are my packages?",
+        "My PARCEL is late!",
+        "Where are my parcels?",
+        "Can you help with tracking?",
+        "What happened to my order?",
+        "What happened to my order?!",
+    ]
+
+    for question in questions:
+        support.reset_mock()
+        assert rag.answer_with_sources(question) == support.return_value
+        support.assert_called_once_with(question)
+
+    general.assert_not_called()
+
+
+def test_general_wording_stays_with_general_assistant(monkeypatch) -> None:
+    support = Mock()
+    general = Mock(return_value={"answer": "General answer.", "citations": []})
+    monkeypatch.setattr(rag, "run_support_workflow", support)
+    monkeypatch.setattr(rag, "answer_general_question", general)
+
+    for question in ["Hello!", "Help me plan my afternoon.", "Explain photosynthesis."]:
+        general.reset_mock()
+        assert rag.answer_with_sources(question) == general.return_value
+        general.assert_called_once_with(question)
+
+    support.assert_not_called()

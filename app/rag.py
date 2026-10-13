@@ -1,3 +1,5 @@
+import re
+
 from app.chat import generate_text
 from app.workflow import run_support_workflow
 
@@ -23,6 +25,11 @@ SUPPORT_TERMS = {
     "account",
     "password",
     "payment",
+    "package",
+    "packages",
+    "parcel",
+    "parcels",
+    "tracking",
 }
 
 
@@ -32,7 +39,7 @@ def is_dangerous_request(message: str) -> bool:
 
 
 def is_support_question(question: str) -> bool:
-    words = set(question.lower().replace("?", "").split())
+    words = set(re.findall(r"[a-z]+", question.lower()))
     return bool(words & SUPPORT_TERMS)
 
 

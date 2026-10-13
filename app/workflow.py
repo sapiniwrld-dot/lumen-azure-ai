@@ -1,3 +1,5 @@
+import re
+
 from typing_extensions import NotRequired, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -87,6 +89,11 @@ Question:
 
     answer = generate_text(prompt, max_output_tokens=500)
 
+    cited_numbers = {
+        int(number)
+        for number in re.findall(r"\[([0-9]+)\]", answer)
+    }
+
     citations: list[Citation] = [
         {
             "number": position,
@@ -95,6 +102,7 @@ Question:
             "score": round(source["score"], 6),
         }
         for position, source in enumerate(state["sources"], start=1)
+        if position in cited_numbers
     ]
 
     return {
