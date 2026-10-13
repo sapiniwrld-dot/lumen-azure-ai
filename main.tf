@@ -183,7 +183,7 @@ resource "azurerm_container_app" "web" {
 
     container {
       name   = "lumen"
-      image  = "ghcr.io/sapiniwrld-dot/lumen-azure-ai@sha256:42b9e8485ca10e9e5d6147cb78f9e1793b0d519f417088c31ffbc25459462ec6"
+      image  = "ghcr.io/sapiniwrld-dot/lumen-azure-ai@sha256:80ad9b5862bc3891d8dd23914dc67f941373ce2098aac181e89e556c900f3ece"
       cpu    = 0.5
       memory = "1Gi"
 
